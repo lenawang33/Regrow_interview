@@ -5,7 +5,7 @@ import geopandas as gpd
 import seaborn as sns
 import requests as requests
 
-
+#########################################################################################################################################
 ####### QAQC Analysis Sample##########
 #Reading in the Kansas data from Github
 ks_qaqc = "https://raw.githubusercontent.com/lenawang33/Regrow_interview/main/Kansas_Duplicates.csv"
@@ -33,7 +33,7 @@ vari_prec.columns = ['sample_precision', 'coefficient_of_variation']
 print(vari_prec)
 
 
-#Arranging the plots into a single figure
+#Arranging coefficient and variance and sample precision plots into a single figure
 fig, axes = plt.subplots(1, 2, figsize=(14, 6))
 # Plotting coefficient of variation
 sns.histplot(vari_prec['coefficient_of_variation'], bins=30, kde=True, ax=axes[0])
@@ -56,7 +56,7 @@ vari_prec2 = vari_prec[(vari_prec['coefficient_of_variation'] > 0.8) & (vari_pre
 print("Fields with high coefficient of variation and low sample precision:")
 print(vari_prec2) #The ones that have high variation and low precision (less good data) are %Na Sat, Rhizobia, Protozoan
 
-
+###########################################################################################################################
 ###Spatial Plotting Sample##########
 
 #Reading in Oregon Well data from Github
