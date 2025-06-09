@@ -3,6 +3,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import geopandas as gpd
 import seaborn as sns
+import requests as requests
+
 
 ####### QAQC Analysis Sample##########
 #Reading in the Kansas data
@@ -59,26 +61,62 @@ print(vari_prec2) #The ones that have high variation and low precision (less goo
 
 #Reading in Oregon Well data
 or_well_loc = "https://raw.githubusercontent.com/lenawang33/Regrow_interview/main/First3_Last3_GWMA.csv"
-
+or_well_df = pd.read_csv(or_well_loc, encoding = 'utf-8')
 
 
 #Reading in Oregon outline geojson
 or_outline_loc = "https://raw.githubusercontent.com/lenawang33/Regrow_interview/main/Oregon_State_Boundary_4303926865431890091.geojson"
-or_outline_gdf = gpd.read_file(or_outline_loc)
+response1 = requests.get(or_outline_loc)
+or_outline = response1.content.decode('utf-8') #Decode as UTF-8
+or_outline_gdf = gpd.read_file(or_outline)
 
-#Reading in Southern Willamette Valley shape file
-swv_loc = "https://raw.githubusercontent.com/lenawang33/Regrow_interview/Groundwater_Management_Area_So_Willamette_Valley_-4006589162549273205.geojson"
-swv_outline_gdf = gpd.read_file(swv_loc)
-# Reading in the Oregon well data
-or_well_df = pd.read_csv(or_well_loc)
-# Renaming columns for clarity
+#Reading in Southern Willamette Valley geojson
+swv_loc = "https://raw.githubusercontent.com/lenawang33/Regrow_interview/main/Groundwater_Management_Area_So_Willamette_Valley.geojson"
+response = requests.get(swv_loc)
+swv_outline = response.content.decode('utf-8')  # Decode as UTF-8
+swv_outline_gdf = gpd.read_file(swv_outline)
 
 
 
-# Converting the DataFrame to a GeoDataFrame
-or_well_gdf = gpd.GeoDataFrame(
-    or_well_df, 
-    geometry = gpd.points_from_xy(or_well_df['Long_Dec'], or_well_df['Lat_Dec']),
-    crs = "EPSG:4326"  # Assuming the coordinates are in WGS84
-)
+#Plotting the wells in the Southern Willamette Valley coloring wells by Last
+fig2, ax = plt.subplots(figsize = (20, 20))
+or_well_gdf = gpd.GeoDataFrame(or_well_df, 
+                               geometry = gpd.points_from_xy(or_well_df['Long_Dec'], or_well_df['Lat_Dec']))
+or_well_gdf.plot(ax = ax,
+                 column = 'Last',
+                 legend = True,
+                 markersize = 50,
+                 cmap = 'viridis',
+                 alpha = 0.7,
+                 legend_kwds = {'label': "Average Nitrate \nmg NO$_3$-N/L \n(2021-2024)", 'shrink': 0.5, 
+                                'orientation': 'vertical'}
+                 )
+# Adding the Southern Willamette Valley boundary
+swv_outline_gdf.boundary.plot(ax = ax, 
+                              color='blue',
+                              linewidth = 1,
+                              label = 'SWV Outline')
+# Adding labels and title
+ax.set_title('Oregon Domestic Wells in Southern Willamette Valley')
+ax.set_xlabel('Longitude')
+ax.set_ylabel('Latitude')
+#Make sure the legend does not overlap with the plot
+ax.legend(loc = 'lower right', bbox_to_anchor = (1, 0.8), 
+          fontsize = 7)
+#Building inset plot in the lower left corner
+inset_ax = ax.inset_axes([0.09, 0.0, 0.35, 0.2])  # Location of inset plot
+or_outline_gdf.boundary.plot(ax = inset_ax, color = 'black', linewidth = 1)
+swv_outline_gdf.boundary.plot(ax = inset_ax, color = 'blue', linewidth = 1)
+inset_ax.set_xlim(-125, -116)  # Region of interest
+inset_ax.set_ylim(41, 47)      # Region of interest
+inset_ax.set_title('OR', fontsize = 8, pad = 0.05)  # Make inset title text smaller
+inset_ax.tick_params(axis = 'both', labelsize = 3, pad = 0.05)  # Make tick labels smaller
+plt.show()
+
+
+
+
+
+
+
 
