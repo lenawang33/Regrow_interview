@@ -7,7 +7,7 @@ import requests as requests
 
 
 ####### QAQC Analysis Sample##########
-#Reading in the Kansas data
+#Reading in the Kansas data from Github
 ks_qaqc = "https://raw.githubusercontent.com/lenawang33/Regrow_interview/main/Kansas_Duplicates.csv"
 ks_qaqc_df = pd.read_csv(ks_qaqc)
 
@@ -59,18 +59,18 @@ print(vari_prec2) #The ones that have high variation and low precision (less goo
 
 ###Spatial Plotting Sample##########
 
-#Reading in Oregon Well data
+#Reading in Oregon Well data from Github
 or_well_loc = "https://raw.githubusercontent.com/lenawang33/Regrow_interview/main/First3_Last3_GWMA.csv"
 or_well_df = pd.read_csv(or_well_loc, encoding = 'utf-8')
 
 
-#Reading in Oregon outline geojson
+#Reading in Oregon outline geojson from Github
 or_outline_loc = "https://raw.githubusercontent.com/lenawang33/Regrow_interview/main/Oregon_State_Boundary_4303926865431890091.geojson"
 response1 = requests.get(or_outline_loc)
 or_outline = response1.content.decode('utf-8') #Decode as UTF-8
 or_outline_gdf = gpd.read_file(or_outline)
 
-#Reading in Southern Willamette Valley geojson
+#Reading in Southern Willamette Valley geojson from Github
 swv_loc = "https://raw.githubusercontent.com/lenawang33/Regrow_interview/main/Groundwater_Management_Area_So_Willamette_Valley.geojson"
 response = requests.get(swv_loc)
 swv_outline = response.content.decode('utf-8')  # Decode as UTF-8
@@ -78,8 +78,9 @@ swv_outline_gdf = gpd.read_file(swv_outline)
 
 
 
-#Plotting the wells in the Southern Willamette Valley coloring wells by Last
-fig2, ax = plt.subplots(figsize = (20, 20))
+#Plotting the wells in the Southern Willamette Valley coloring wells by Average Nitrate Concentration from 2021-2024
+wells_plot, ax = plt.subplots(figsize = (20, 20))
+#Plotting the well locations
 or_well_gdf = gpd.GeoDataFrame(or_well_df, 
                                geometry = gpd.points_from_xy(or_well_df['Long_Dec'], or_well_df['Lat_Dec']))
 or_well_gdf.plot(ax = ax,
@@ -104,8 +105,10 @@ ax.set_ylabel('Latitude')
 ax.legend(loc = 'lower right', bbox_to_anchor = (1, 0.8), 
           fontsize = 7)
 #Building inset plot in the lower left corner
-inset_ax = ax.inset_axes([0.09, 0.0, 0.35, 0.2])  # Location of inset plot
+inset_ax = ax.inset_axes([0.09, 0.0, 0.35, 0.2])  # Location of inset plot in respect to main plot
+#Adding the OR Boundary
 or_outline_gdf.boundary.plot(ax = inset_ax, color = 'black', linewidth = 1)
+#Adding the Southern Willamette Boundary into Oregon Boundary
 swv_outline_gdf.boundary.plot(ax = inset_ax, color = 'blue', linewidth = 1)
 inset_ax.set_xlim(-125, -116)  # Region of interest
 inset_ax.set_ylim(41, 47)      # Region of interest
