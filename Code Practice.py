@@ -68,4 +68,52 @@ filtered_tukey_results = pd.concat(filtered_tukey_dfs, ignore_index = True)
 print(filtered_tukey_results)
 
 
+#Creating random array, which is better for mathematical and vectorized operations
+a = np.array([1, 2, 3, 4, 5])
+b = np.array([12, 16, 19, 15, 17])
+
+#Creating a dataframe from the lists
+df = pd.DataFrame({'a':a, 'b': b})
+
+def sum(x, y):
+    return x + y
+
+test = sum(a, b)
+
+
+
+#Creating a random array of 1000 numbers
+a = np.random.uniform(-10, 5, 1000)
+b = np.random.uniform(-10, 5, 1000)
+
+df1 = pd.DataFrame({'a':a, 'b': b})
+
+#Filtering out negative values, calculate only the sum of the positive values
+def sum(df, col1, col2):
+    filtered_df = df[(df[col1] >= 0) & (df[col2] >= 0)]
+    return filtered_df[col1] + filtered_df[col2]
+
+test = sum(df1, df1.columns[0], df1.columns[1])
+
+#Getting cities list
+cities = [
+    'Portland, OR', 'Eugene, OR', 'Salem, OR', 'Seattle, WA', 'Spokane, WA', 'Tacoma, WA',
+    'San Francisco, CA', 'Los Angeles, CA', 'San Diego, CA', 'Sacramento, CA', 'Fresno, CA',
+    'Denver, CO', 'Boulder, CO', 'Fort Collins, CO', 'Chicago, IL', 'Springfield, IL',
+    'New York, NY', 'Buffalo, NY', 'Rochester, NY', 'Boston, MA', 'Cambridge, MA',
+    'Austin, TX', 'Dallas, TX', 'Houston, TX', 'San Antonio, TX', 'Miami, FL', 'Orlando, FL',
+    'Atlanta, GA', 'Savannah, GA', 'Minneapolis, MN', 'St. Paul, MN', 'Phoenix, AZ',
+    'Tucson, AZ', 'Philadelphia, PA', 'Pittsburgh, PA', 'Detroit, MI', 'Ann Arbor, MI',
+    'Salt Lake City, UT', 'Provo, UT', 'Las Vegas, NV', 'Reno, NV', 'Charlotte, NC',
+    'Raleigh, NC', 'Columbus, OH', 'Cleveland, OH', 'Cincinnati, OH'
+]
+cities_df = pd.DataFrame(cities, columns = ['Cities'])
+cities_separate = cities_df['Cities'].str.split(',', expand = True)
+cities_separate.columns = ['City', 'State']
+
+
+#count the number of cities within each state
+state_counts = cities_separate['State'].value_counts().reset_index()
+
+state_counts.columns = ['State', 'Count']
 
